@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLAYLIST SOUND</title>
+    
+    <!-- Google Fonts & Font Awesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-dark: #07070a;
+            --bg-card: rgba(20, 20, 28, 0.75);
+            --gold-primary: #f39c12;
+            --gold-gradient: linear-gradient(135deg, #ffe066 0%, #f39c12 50%, #e67e22 100%);
+            --text-light: #f8f9fa;
+            --text-muted: #a0a0b0;
+            --glass-border: rgba(255, 215, 0, 0.18);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(243, 156, 18, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(230, 126, 34, 0.08) 0%, transparent 40%);
+        }
+
+        .gold-text {
+            background: var(--gold-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-family: 'Cinzel', serif;
+        }
+
+        /* LOGIN SCREEN */
+        #login-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 1000;
+            background: rgba(7, 7, 10, 0.95);
+            backdrop-filter: blur(12px);
+            transition: all 0.8s ease;
+        }
+
+        .login-card {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            padding: 40px;
+            border-radius: 20px;
+            width: 90%; max-width: 420px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.8), 0 0 20px rgba(243, 156, 18, 0.25);
+            text-align: center;
+            animation: fadeIn 0.8s ease;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block; margin-bottom: 8px; font-size: 0.85rem; color: var(--text-muted);
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            color: #fff;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .input-group input:focus {
+            border-color: var(--gold-primary);
+            box-shadow: 0 0 10px rgba(243, 156, 18, 0.3);
+        }
+
+        .btn-gold {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: var(--gold-gradient);
+            color: #000;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(243, 156, 18, 0.4);
+        }
+
+        .btn-gold:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(243, 156, 18, 0.6);
+        }
+
+        /* LOGIN SUCCESS OVERLAY */
+        #success-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.92);
+            display: none;
+            flex-direction: column;
+            align-items: center; justify-content: center;
+            z-index: 2000;
+            transition: opacity 0.5s ease;
+        }
+
+        .success-icon {
+            font-size: 80px;
+            color: var(--gold-primary);
+            animation: bounceIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        /* MAIN DASHBOARD */
+        #app-screen {
+            display: none;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--glass-border);
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .search-bar {
+            position: relative;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 12px 15px 12px 42px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 25px;
+            color: #fff;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .search-bar input:focus {
+            border-color: var(--gold-primary);
+            box-shadow: 0 0 10px rgba(243, 156, 18, 0.3);
+        }
+
+        .search-bar i {
+            position: absolute;
+            left: 15px; top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        /* FAB FLOATING ADD BUTTON */
+        .fab-add {
+            position: fixed;
+            bottom: 30px; right: 30px;
+            width: 60px; height: 60px;
+            border-radius: 50%;
+            background: var(--gold-gradient);
+            border: none;
+            color: #000;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(243, 156, 18, 0.5);
+            transition: 0.3s;
+            z-index: 500;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .fab-add:hover {
+            transform: scale(1.1) rotate(90deg);
+        }
+
+        /* PLAYLIST GRID */
+        .grid-playlist {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .card-media {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: 0.3s;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+
+        .card-media:hover {
+            transform: translateY(-5px);
+            border-color: var(--gold-primary);
+            box-shadow: 0 12px 25px rgba(243, 156, 18, 0.25);
+        }
+
+        .media-container {
+            width: 100%;
+            height: 190px;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .media-container video, .media-container audio {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-info {
+            padding: 15px;
+            position: relative;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: #fff;
+        }
+
+        .card-artist {
+            color: var(--gold-primary);
+            font-size: 0.9rem;
+            display: flex; align-items: center; gap: 8px;
+            font-weight: 600;
+        }
+
+        .btn-delete {
+            background: none;
+            border: none;
+            color: #e74c3c;
+            font-size: 0.85rem;
+            margin-top: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex; align-items: center; gap: 5px;
+        }
+
+        .btn-delete:hover {
+            color: #ff6b6b;
+        }
+
+        /* UPLOAD MODAL */
+        .modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center; justify-content: center;
+            z-index: 1500;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%; max-width: 480px;
+            position: relative;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px; right: 20px;
+            color: var(--text-muted);
+            font-size: 22px; cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .close-modal:hover { color: #fff; }
+
+        /* UPLOAD PROGRESS BAR */
+        .progress-container {
+            width: 100%;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            height: 10px;
+            margin-top: 15px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--gold-gradient);
+            transition: width 0.3s ease;
+        }
+
+        /* ANIMATIONS */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen">
+        <div class="login-card">
+            <h1 class="gold-text" style="font-size: 2.2rem; margin-bottom: 5px;">PLAYLIST SOUND</h1>
+            <p style="color: var(--text-muted); margin-bottom: 25px; font-size: 0.85rem; letter-spacing: 1px;">CLOUD PORTAL</p>
+            
+            <form id="loginForm">
+                <div class="input-group">
+                    <label><i class="fa-solid fa-user"></i> Username</label>
+                    <input type="text" id="username" placeholder="Masukkan username" required>
+                </div>
+                <div class="input-group">
+                    <label><i class="fa-solid fa-key"></i> Password</label>
+                    <input type="password" id="password" placeholder="Masukkan password" required>
+                </div>
+                <button type="submit" class="btn-gold" style="margin-top: 10px;">MASUK PORTAL</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- LOGIN SUCCESS OVERLAY -->
+    <div id="success-overlay">
+        <i class="fa-solid fa-circle-check success-icon"></i>
+        <h2 class="gold-text" style="margin-top: 20px; font-size: 2.2rem;">LOGIN SUCCESS</h2>
+        <p style="color: #fff; margin-top: 5px;">Welcome to PLAYLIST SOUND</p>
+    </div>
+
+    <!-- MAIN APP DASHBOARD -->
+    <div id="app-screen">
+        <header>
+            <h2 class="gold-text"><i class="fa-solid fa-crown"></i> PLAYLIST SOUND</h2>
+            <div class="search-bar">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="searchInput" placeholder="Cari penyanyi / artis..." onkeyup="filterPlaylist()">
+            </div>
+        </header>
+
+        <main>
+            <div class="grid-playlist" id="playlistGrid">
+                <!-- Media Cards Rendered From Firebase -->
+            </div>
+        </main>
+
+        <button class="fab-add" onclick="openModal()"><i class="fa-solid fa-plus"></i></button>
+    </div>
+
+    <!-- UPLOAD MODAL -->
+    <div class="modal" id="uploadModal">
+        <div class="modal-content">
+            <i class="fa-solid fa-xmark close-modal" onclick="closeModal()"></i>
+            <h3 class="gold-text" style="margin-bottom: 20px;"><i class="fa-solid fa-cloud-arrow-up"></i> Upload Media</h3>
+            
+            <form id="uploadForm">
+                <div class="input-group">
+                    <label>Judul Lagu</label>
+                    <input type="text" id="songTitle" placeholder="Contoh: Sial" required>
+                </div>
+                <div class="input-group">
+                    <label>Penyanyi</label>
+                    <input type="text" id="songArtist" placeholder="Contoh: Mahalini" required>
+                </div>
+                <div class="input-group">
+                    <label>Pilih File Video / Audio (Bebas Durasi)</label>
+                    <input type="file" id="mediaFile" accept="video/*,audio/*" required>
+                </div>
+
+                <div class="progress-container" id="progressContainer">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <p id="uploadStatus" style="font-size: 0.8rem; color: var(--gold-primary); margin-top: 8px; text-align: center; display: none;"></p>
+
+                <button type="submit" id="btnSubmitUpload" class="btn-gold" style="margin-top: 20px;">UPLOAD KE CLOUD STORAGE</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase SDK (Version 9 Moduler via CDN) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+
+        // CONFIGURATION FIREBASE (Ganti dengan Kunci Firebase Anda)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDy_PF8EwZyIbGhSlMboWoY7TIZFzN67_A",
+            authDomain: "putraplaylistsound.firebaseapp.com",
+            projectId: "putraplaylistsound",
+            storageBucket: "putraplaylistsound.firebasestorage.app",
+            messagingSenderId: "65036235954",
+            appId: "1:65036235954:web:374951ae234808597305ab"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+
+        let localPlaylistCache = [];
+
+        // LOGIN AUTHENTICATION
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const u = document.getElementById('username').value;
+            const p = document.getElementById('password').value;
+
+            if(u === 'putraplaylist' && p === '19') {
+                document.getElementById('login-screen').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('login-screen').style.display = 'none';
+                    const overlay = document.getElementById('success-overlay');
+                    overlay.style.display = 'flex';
+                    
+                    setTimeout(() => {
+                        overlay.style.opacity = '0';
+                        setTimeout(() => {
+                            overlay.style.display = 'none';
+                            document.getElementById('app-screen').style.display = 'block';
+                            loadPlaylistFromFirebase();
+                        }, 500);
+                    }, 1500);
+                }, 800);
+            } else {
+                alert('Username atau Password Salah!');
+            }
+        });
+
+        // UPLOAD FILE TO FIREBASE STORAGE & SAVE TO FIRESTORE
+        document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const title = document.getElementById('songTitle').value;
+            const artist = document.getElementById('songArtist').value;
+            const fileInput = document.getElementById('mediaFile');
+            const file = fileInput.files[0];
+
+            if(!file) return alert('Silakan pilih file video/audio!');
+
+            const progressContainer = document.getElementById('progressContainer');
+            const progressBar = document.getElementById('progressBar');
+            const uploadStatus = document.getElementById('uploadStatus');
+            const btnSubmit = document.getElementById('btnSubmitUpload');
+
+            progressContainer.style.display = 'block';
+            uploadStatus.style.display = 'block';
+            btnSubmit.disabled = true;
+            btnSubmit.style.opacity = '0.5';
+
+            // Storage Path Reference
+            const storagePath = `playlist_media/${Date.now()}_${file.name}`;
+            const storageRef = ref(storage, storagePath);
+            const uploadTask = uploadBytesResumable(storageRef, file);
+
+            uploadTask.on('state_changed', 
+                (snapshot) => {
+                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    progressBar.style.width = progress + '%';
+                    uploadStatus.innerText = `Mengunggah ke Cloud Storage: ${Math.round(progress)}%`;
+                }, 
+                (error) => {
+                    alert('Gagal Mengunggah: ' + error.message);
+                    btnSubmit.disabled = false;
+                    btnSubmit.style.opacity = '1';
+                }, 
+                async () => {
+                    // Upload Selesai, Dapatkan URL Download
+                    const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+
+                    // Simpan Metadata ke Firestore
+                    await addDoc(collection(db, "playlists"), {
+                        title: title,
+                        artist: artist,
+                        mediaUrl: downloadURL,
+                        storagePath: storagePath,
+                        createdAt: new Date()
+                    });
+
+                    uploadStatus.innerText = 'Upload Berhasil & Tersimpan di Cloud!';
+                    setTimeout(() => {
+                        closeModal();
+                        document.getElementById('uploadForm').reset();
+                        progressContainer.style.display = 'none';
+                        uploadStatus.style.display = 'none';
+                        btnSubmit.disabled = false;
+                        btnSubmit.style.opacity = '1';
+                        loadPlaylistFromFirebase();
+                    }, 1000);
+                }
+            );
+        });
+
+        // READ / FETCH PLAYLIST FROM FIRESTORE
+        async function loadPlaylistFromFirebase() {
+            const grid = document.getElementById('playlistGrid');
+            grid.innerHTML = `<p style="color:var(--gold-primary); grid-column: 1/-1; text-align:center; padding: 40px;"><i class="fa-solid fa-spinner fa-spin"></i> Memuat Playlist dari Cloud...</p>`;
+
+            try {
+                const q = query(collection(db, "playlists"), orderBy("createdAt", "desc"));
+                const querySnapshot = await getDocs(q);
+                localPlaylistCache = [];
+
+                querySnapshot.forEach((docSnap) => {
+                    localPlaylistCache.push({
+                        id: docSnap.id,
+                        ...docSnap.data()
+                    });
+                });
+
+                renderPlaylistUI(localPlaylistCache);
+            } catch(e) {
+                grid.innerHTML = `<p style="color:#e74c3c; grid-column: 1/-1; text-align:center;">Gagal memuat playlist: ${e.message}</p>`;
+            }
+        }
+
+        // RENDER CARDS TO DASHBOARD
+        function renderPlaylistUI(items) {
+            const grid = document.getElementById('playlistGrid');
+            grid.innerHTML = '';
+
+            if(items.length === 0) {
+                grid.innerHTML = `<p style="color:var(--text-muted); grid-column: 1/-1; text-align:center; padding: 40px;">Belum ada media di playCloud.</p>`;
+                return;
+            }
+
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card-media';
+                card.innerHTML = `
+                    <div class="media-container">
+                        <video controls style="width:100%; height:100%;">
+                            <source src="${item.mediaUrl}">
+                            Browser Anda tidak mendukung pemutaran video ini.
+                        </video>
+                    </div>
+                    <div class="card-info">
+                        <div class="card-title">${item.title}</div>
+                        <div class="card-artist"><i class="fa-solid fa-microphone"></i> ${item.artist}</div>
+                        <button class="btn-delete" data-id="${item.id}" data-path="${item.storagePath}">
+                            <i class="fa-solid fa-trash-can"></i> Hapus Media
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+
+            // Bind Delete Buttons
+            document.querySelectorAll('.btn-delete').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    const path = this.getAttribute('data-path');
+                    deleteMedia(id, path);
+                });
+            });
+        }
+
+        // DELETE MEDIA FROM CLOUD
+        async function deleteMedia(id, storagePath) {
+            if(confirm('Apakah Anda yakin ingin menghapus media ini dari Cloud Storage?')) {
+                try {
+                    // Hapus dari Firestore Database
+                    await deleteDoc(doc(db, "playlists", id));
+
+                    // Hapus file dari Cloud Storage jika ada
+                    if(storagePath) {
+                        const fileRef = ref(storage, storagePath);
+                        await deleteObject(fileRef);
+                    }
+
+                    alert('Media berhasil dihapus!');
+                    loadPlaylistFromFirebase();
+                } catch(e) {
+                    alert('Gagal menghapus media: ' + e.message);
+                }
+            }
+        }
+
+        // SEARCH / FILTER FUNCTION
+        window.filterPlaylist = function() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = localPlaylistCache.filter(item => item.artist.toLowerCase().includes(query) || item.title.toLowerCase().includes(query));
+            renderPlaylistUI(filtered);
+        };
+
+        // MODAL TOGGLE
+        window.openModal = function() { document.getElementById('uploadModal').style.display = 'flex'; };
+        window.closeModal = function() { document.getElementById('uploadModal').style.display = 'none'; };
+    </script>
+</body>
+</html>
